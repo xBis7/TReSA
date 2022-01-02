@@ -2,6 +2,8 @@
 TestData/*
 Index/*
 
+/.metadata/
+
 #keep a few files as example documents
 !TestData/Article0.txt
 !TestData/Article1.txt
@@ -9,3 +11,4 @@ Index/*
 !TestData/Article3.txt
 !TestData/Article4.txt
 !TestData/Article5.txt
+
