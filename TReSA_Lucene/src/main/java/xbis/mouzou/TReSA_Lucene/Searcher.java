@@ -3,6 +3,7 @@ package xbis.mouzou.TReSA_Lucene;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -39,27 +40,79 @@ public class Searcher {
       //queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer());
    }
    
-   public TopDocs search(String searchQuery) throws IOException, ParseException {
+   public TopDocs search(String searchQuery, int resultNum, boolean advSearch) throws IOException, ParseException {
       //query = queryParser.parse(searchQuery);
 
-      //
-      BooleanQuery.Builder chainQuery = new BooleanQuery.Builder();
+	  if(advSearch == true) {
+		  
+		  String[] queryStr = searchQuery.split("&", -1);
+		  
+		  String placesStr = queryStr[0];
+		  String peopleStr = queryStr[1];
+		  String titleStr = queryStr[2];
+		  String bodyStr = queryStr[3];
+		  		  
+		  BooleanQuery.Builder chainQuery = new BooleanQuery.Builder();
 
-      Query placesQuery = new TermQuery(new Term(LuceneConstants.PLACES, searchQuery));
-      Query peopleQuery = new TermQuery(new Term(LuceneConstants.PEOPLE, searchQuery));
-      Query titleQuery = new TermQuery(new Term(LuceneConstants.TITLE, searchQuery));
-      Query bodyQuery = new TermQuery(new Term(LuceneConstants.BODY, searchQuery));
+	      Query placesQuery = new TermQuery(new Term(LuceneConstants.PLACES, placesStr));
+	      Query peopleQuery = new TermQuery(new Term(LuceneConstants.PEOPLE, peopleStr));
+	      Query titleQuery = new TermQuery(new Term(LuceneConstants.TITLE, titleStr));
+	      Query bodyQuery = new TermQuery(new Term(LuceneConstants.BODY, bodyStr));
+	      
+	      if(placesStr.isBlank()) {
+	    	  chainQuery.add(placesQuery, BooleanClause.Occur.SHOULD);
+	      }
+	      else {
+	    	  chainQuery.add(placesQuery, BooleanClause.Occur.MUST);
+	      }
+	      
+	      if(peopleStr.isBlank()) {
+	    	  chainQuery.add(peopleQuery, BooleanClause.Occur.SHOULD);
+	      }
+	      else {
+	    	  chainQuery.add(peopleQuery, BooleanClause.Occur.MUST);
+	      }
 
-      chainQuery.add(placesQuery, BooleanClause.Occur.SHOULD);
-      chainQuery.add(peopleQuery, BooleanClause.Occur.SHOULD);
-      chainQuery.add(titleQuery, BooleanClause.Occur.SHOULD);
-      chainQuery.add(bodyQuery, BooleanClause.Occur.SHOULD);
+	      if(titleStr.isBlank()) {
+	    	  chainQuery.add(titleQuery, BooleanClause.Occur.SHOULD);
+	      }
+	      else {
+	    	  chainQuery.add(titleQuery, BooleanClause.Occur.MUST);
+	      }
+			
+	      if(bodyStr.isBlank()) {
+	    	  chainQuery.add(bodyQuery, BooleanClause.Occur.SHOULD); 
+	      }
+	      else {
+	    	  chainQuery.add(bodyQuery, BooleanClause.Occur.MUST);  
+	      }
+	      
+	      BooleanQuery booleanQuery = chainQuery.build();
+
+	      //
+	      System.out.println("query: " + booleanQuery.toString());
+	      return indexSearcher.search(booleanQuery, resultNum);
+	  }
+	  else {
+		  //check if query contains more than one word
+		  //deal accordingly
+		  
+//		  String[] queryStr = searchQuery.split("[ ,.;:]+");
+//		  
+//		  if(queryStr.length > 1) {
+//			  //split query
+//		  }
+//		  else {
+//			  
+//		  }
+//		  
+	      queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer());
+		  query = queryParser.parse(searchQuery);
+		  System.out.println("query: " + query.toString());
+		  return indexSearcher.search(query, resultNum);
+	  }
+	  
       
-      BooleanQuery booleanQuery = chainQuery.build();
-
-      //
-      System.out.println("query: " + booleanQuery.toString());
-      return indexSearcher.search(booleanQuery, LuceneConstants.MAX_SEARCH);
    }
    
    public Document getDocument(ScoreDoc scoreDoc) throws CorruptIndexException, IOException {

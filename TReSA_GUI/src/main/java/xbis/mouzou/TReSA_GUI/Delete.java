@@ -12,8 +12,8 @@ public class Delete {
 		StackPane stackPane = new StackPane();
 		Scene scene = new Scene(stackPane, 1080, 820);
 		
-		stage.setMinHeight(600);
-        stage.setMinWidth(700);     
+		deleteWin.setMinHeight(700);
+		deleteWin.setMinWidth(900);     
         
         
         deleteWin.setTitle("Delete article");

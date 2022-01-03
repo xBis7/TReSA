@@ -12,9 +12,9 @@ public class Add {
 		StackPane stackPane = new StackPane();
 		Scene scene = new Scene(stackPane, 1080, 820);
 		
-		stage.setMinHeight(600);
-        stage.setMinWidth(700);     
-        
+		addWin.setMinHeight(700);
+		addWin.setMinWidth(900);     
+		
         addWin.setTitle("Add new article");
         addWin.setScene(scene);
         addWin.show();

@@ -53,9 +53,9 @@ public class Indexer {
       String places = allLines.substring(placesStart, placesEnd);
 
       //places are not splited with whitespaces or any other delimiter
-      //we might need to use StringField, to store them as an entire string 
+      //we use StringField to store them as an entire string 
       //and delimit them later
-      Field placesField = new Field(LuceneConstants.PLACES, places, TextField.TYPE_STORED);
+      Field placesField = new Field(LuceneConstants.PLACES, places, StringField.TYPE_STORED);
       
       //index people
       int peopleStart = allLines.indexOf("<PEOPLE>") + "<PEOPLE>".length();
@@ -79,7 +79,11 @@ public class Indexer {
       Field bodyField = new Field(LuceneConstants.BODY, body, TextField.TYPE_STORED);
 
       //System.out.println("places:----- " + placesField + "\npeople:----- " + peopleField + "\ntitle:----- " + titleField + "\nbody:----- " + bodyField);
-         
+      
+      //index all file contents at once for simple search
+      String contents = places + "\n" + people + "\n" + title + "\n" + body;
+      Field contentsField = new Field(LuceneConstants.CONTENTS, contents, TextField.TYPE_STORED);
+      
       //index file name
       Field fileNameField = new Field(LuceneConstants.FILE_NAME, file.getName(), StringField.TYPE_STORED);
 
@@ -90,6 +94,7 @@ public class Indexer {
       document.add(peopleField);
       document.add(titleField);
       document.add(bodyField);
+      document.add(contentsField);
       document.add(fileNameField);
       document.add(filePathField);
 
@@ -98,7 +103,7 @@ public class Indexer {
 
    private void indexFile(File file) throws IOException {
 
-      System.out.println("Indexing " + file.getCanonicalPath());
+      //System.out.println("Indexing " + file.getCanonicalPath());
       Document document = getDocument(file);
       writer.addDocument(document);
    

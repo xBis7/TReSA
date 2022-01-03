@@ -12,22 +12,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
 public class LuceneTester {
-
-//	File currentDir = new File(".");
-//	File parentDir = currentDir.getParentFile();
-//   
-//	File index = new File(parentDir, "Index/");
-//
-//	//path to Index dir 
-//	String indexDir = index.getAbsolutePath();
-//
-//	File data = new File(parentDir, "TestData/");
-//   
-//	//path to Data dir
-//	String dataDir = data.getAbsolutePath();
-//
-//	Indexer indexer;
-//	Searcher searcher;
 	
 	File currentDir;
 	File parentDir;
@@ -58,7 +42,7 @@ public class LuceneTester {
 		dataDir = data.getAbsolutePath();
 	}
 
-	public void tester(String query) {
+	public void tester(String query, int resultNum, boolean advSearch) {
       LuceneTester tester;
       try {
          tester = new LuceneTester();
@@ -66,7 +50,7 @@ public class LuceneTester {
          //delete existing index files
          tester.cleanIndexFiles();
          tester.createIndex();
-         tester.search(query);
+         tester.search(query, resultNum, advSearch);
       } catch (IOException e) {
          e.printStackTrace();
       } catch (ParseException e) {
@@ -83,18 +67,18 @@ public class LuceneTester {
       System.out.println(numIndexed + " File(s) indexed, time taken: " + (endTime - startTime)+" ms");
    }
    
-   private void search(String searchQuery) throws IOException, ParseException {
+   private void search(String searchQuery, int resultNum, boolean advSearch) throws IOException, ParseException {
       searcher = new Searcher(indexDir);
       long startTime = System.currentTimeMillis();
       long endTime = System.currentTimeMillis();
 
-      TopDocs hits = searcher.search(searchQuery);
+      TopDocs hits = searcher.search(searchQuery, resultNum, advSearch);
       
       System.out.println(hits.totalHits +" documents found. Time :" + (endTime - startTime));
 
       for(ScoreDoc scoreDoc : hits.scoreDocs) {
          Document doc = searcher.getDocument(scoreDoc);
-         System.out.println("File: " + doc.get(LuceneConstants.FILE_PATH));
+         System.out.println("File: " + doc.get(LuceneConstants.FILE_PATH) + "\tScore: " + scoreDoc.score);
       }
 
       searcher.close();
