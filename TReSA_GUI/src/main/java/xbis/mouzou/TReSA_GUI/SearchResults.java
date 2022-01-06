@@ -1,11 +1,21 @@
 package xbis.mouzou.TReSA_GUI;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,12 +26,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import xbis.mouzou.TReSA_Lucene.LuceneTester;
+import xbis.mouzou.TReSA_Lucene.Result;
 
 public class SearchResults {
+	
+	public static ObservableList <Result> data = FXCollections.observableArrayList();
 
-	public static void resultsWindow(Stage stage, String searchQuery, int resultNum, boolean advSearch) {
+	public static List<Result> results = new ArrayList<>();
+	
+	public static void resultsWindow(Stage stage, String searchQuery, int resultNum, boolean advSearch, List<Boolean> checkBoxes) {
 
 		Stage resultsWin = new Stage();
 		StackPane stackPane = new StackPane();
@@ -31,40 +49,77 @@ public class SearchResults {
 		resultsWin.setMinWidth(900); 
 		
 		LuceneTester search = new LuceneTester();
-        search.tester(searchQuery, resultNum, advSearch);
+        results = search.tester(searchQuery, resultNum, advSearch, checkBoxes);
         
         VBox mainVBox = new VBox();
         
         HBox buttonHBox = new HBox();
  
         //label with the searched query
-        Label queryLabel = new Label("Search results for query: '" + searchQuery + "'");
+        Label queryLabel = new Label("Search results for query: '" + searchQuery + "' \t Top: " + resultNum + " results");
         queryLabel.setFont(Font.font("verdaba", FontWeight.NORMAL, FontPosture.REGULAR, 16));
 
-        //give a type to the tableView of the returned Class
-        //TableView<Result> tableView = new TableView<Result>();
-        TableView table = new TableView();
+        TableView<Result> table = new TableView<>();
         
-        //table.setEditable(false);
+
+        TableColumn<Result, String> filePath = new TableColumn<>("File Path");
+        filePath.setCellValueFactory(new PropertyValueFactory<>("path"));
+        filePath.setMinWidth(80);
         
-        TableColumn filePath = new TableColumn("File Path");
-        //filePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
+        TableColumn<Result, String> score = new TableColumn<>("Score");
+        score.setCellValueFactory(new PropertyValueFactory<>("score"));
         
-        TableColumn score = new TableColumn("Score");
-        //score.setCellValueFactory(new PropertyValueFactory<>("score"));
+        TableColumn<Result, String> text = new TableColumn<>("Text");
+        text.setCellValueFactory(new PropertyValueFactory<>("fragments"));
+        text.setCellFactory(new Callback<TableColumn<Result, String>, TableCell<Result, String>>() {
+
+			@Override
+			public TableCell<Result, String> call(TableColumn<Result, String> param) {
+				 return new TableCell<Result, String>(){
+					 @Override
+					 protected void updateItem(String item, boolean empty) {
+						 super.updateItem(item, empty);
+						 
+						 if(item == null || empty) {
+							 setText(null);
+							 setGraphic(null);
+							 setStyle("");
+						 }
+						 else {
+							 WebView webView = new WebView();
+							 WebEngine engine = webView.getEngine();
+							 
+							 webView.setPrefHeight(150);
+							 
+							 setGraphic(webView); 
+							 
+							 engine.loadContent(item);
+							 
+						 }
+					 }
+				 };
+			}        	
+        });
         
-        TableColumn text = new TableColumn("Text");
-        //text.setCellValueFactory(new PropertyValueFactory<>("text"));
+        table.getColumns().add(filePath);
+        table.getColumns().add(score);
+        table.getColumns().add(text);
         
-        table.getColumns().addAll(filePath, score, text);
-        
-      //column text alignment
+        //column text alignment
         filePath.setStyle( "-fx-alignment: CENTER;");
         score.setStyle( "-fx-alignment: CENTER;");
         text.setStyle( "-fx-alignment: CENTER;");
 
         //make columns occupy all table space
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        
+        data = FXCollections.observableArrayList(results);
+        
+        table.setItems(data);
+        
+        Button similarButton = new Button("Similar");
+        similarButton.setFont(Font.font("verdaba", FontWeight.NORMAL, FontPosture.REGULAR, 16));
+        similarButton.setPrefSize(120.0, 60.0);
         
         Button openButton = new Button("Open");
         openButton.setFont(Font.font("verdaba", FontWeight.NORMAL, FontPosture.REGULAR, 16));
@@ -78,7 +133,7 @@ public class SearchResults {
         
         mainVBox.getChildren().addAll(queryLabel, table, buttonHBox);
         
-        buttonHBox.getChildren().addAll(openButton, backButton);
+        buttonHBox.getChildren().addAll(similarButton, openButton, backButton);
         
         mainVBox.setSpacing(20);
         buttonHBox.setSpacing(10);
@@ -88,14 +143,34 @@ public class SearchResults {
         
         StackPane.setMargin(mainVBox, new Insets(20, 20, 20, 20));
         
-        //tableview
-        //file path
-        //score
-        //highlighted part of the file
-        
 		resultsWin.setTitle("Search Results");
 		resultsWin.setScene(scene);
 		resultsWin.show();
+		
+		similarButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				Result result = table.getSelectionModel().getSelectedItem();
+				if(result != null) {
+					int docId = result.getDocId();
+				
+					List<Result> similarResults = new ArrayList<>();
+				
+					try {
+						similarResults = search.moreLikeThis(docId, resultNum);
+						//data.clear();
+						data = FXCollections.observableArrayList(similarResults);
+				        table.setItems(data);
+					} catch (ParseException e) {
+						e.printStackTrace();
+					} catch (InvalidTokenOffsetsException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+        });
 		
 		openButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -108,8 +183,7 @@ public class SearchResults {
 			@Override
 			public void handle(MouseEvent event) {
 				if(advSearch == true) {
-					AdvancedSearch advSearchWin = new AdvancedSearch();
-					advSearchWin.advSearchWindow(stage);
+					AdvancedSearch.advSearchWindow(stage);
 				}
 				else {
 					App mainWin = new App();

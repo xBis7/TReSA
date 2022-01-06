@@ -10,11 +10,14 @@ import java.nio.file.Paths;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -43,6 +46,16 @@ public class Indexer {
 
       Document document = new Document();
       
+      //term vectors are not used
+	  FieldType fieldType = new FieldType();        
+	  fieldType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+	  fieldType.setStored(true);
+	  fieldType.setStoreTermVectors(true);
+	  fieldType.setStoreTermVectorPositions(true);
+	  fieldType.setStoreTermVectorOffsets(true);
+	  fieldType.setTokenized(true);
+	  fieldType.stored();
+      
       String allLines;
 
       allLines = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
@@ -55,40 +68,42 @@ public class Indexer {
       //places are not splited with whitespaces or any other delimiter
       //we use StringField to store them as an entire string 
       //and delimit them later
-      Field placesField = new Field(LuceneConstants.PLACES, places, StringField.TYPE_STORED);
+      Field placesField = new Field(LuceneConstants.PLACES, places, fieldType);
+      
+	
       
       //index people
       int peopleStart = allLines.indexOf("<PEOPLE>") + "<PEOPLE>".length();
       int peopleEnd = allLines.indexOf("</PEOPLE>", peopleStart);
       String people = allLines.substring(peopleStart, peopleEnd);
 
-      Field peopleField = new Field(LuceneConstants.PEOPLE, people, TextField.TYPE_STORED);
+      Field peopleField = new Field(LuceneConstants.PEOPLE, people, fieldType);
 
       //index title
       int titleStart = allLines.indexOf("<TITLE>") + "<TITLE>".length();
       int titleEnd = allLines.indexOf("</TITLE>", titleStart);
       String title = allLines.substring(titleStart, titleEnd);
 
-      Field titleField = new Field(LuceneConstants.TITLE, title, TextField.TYPE_STORED);
+      Field titleField = new Field(LuceneConstants.TITLE, title, fieldType);
 
       //index body
       int bodyStart = allLines.indexOf("<BODY>") + "<BODY>".length();
       int bodyEnd = allLines.indexOf("</BODY>", bodyStart);
       String body = allLines.substring(bodyStart, bodyEnd);
 
-      Field bodyField = new Field(LuceneConstants.BODY, body, TextField.TYPE_STORED);
+      Field bodyField = new Field(LuceneConstants.BODY, body, fieldType);
 
       //System.out.println("places:----- " + placesField + "\npeople:----- " + peopleField + "\ntitle:----- " + titleField + "\nbody:----- " + bodyField);
       
       //index all file contents at once for simple search
       String contents = places + "\n" + people + "\n" + title + "\n" + body;
-      Field contentsField = new Field(LuceneConstants.CONTENTS, contents, TextField.TYPE_STORED);
+      Field contentsField = new Field(LuceneConstants.CONTENTS, contents, fieldType);
       
       //index file name
-      Field fileNameField = new Field(LuceneConstants.FILE_NAME, file.getName(), StringField.TYPE_STORED);
+      Field fileNameField = new Field(LuceneConstants.FILE_NAME, file.getName(), fieldType);
 
       //index file path
-      Field filePathField = new Field(LuceneConstants.FILE_PATH, file.getCanonicalPath(), StringField.TYPE_STORED);
+      Field filePathField = new Field(LuceneConstants.FILE_PATH, file.getCanonicalPath(), fieldType);
 
       document.add(placesField);
       document.add(peopleField);

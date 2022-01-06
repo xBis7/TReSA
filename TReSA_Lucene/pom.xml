@@ -40,9 +40,17 @@
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-demo</artifactId>
+      <artifactId>lucene-highlighter</artifactId>
       <version>${lucene.version}</version>
     </dependency>
+    
+    <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-memory -->
+	<dependency>
+	    <groupId>org.apache.lucene</groupId>
+	    <artifactId>lucene-memory</artifactId>
+	    <version>${lucene.version}</version>
+	</dependency>
+
     <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 	<dependency>
 	    <groupId>commons-io</groupId>

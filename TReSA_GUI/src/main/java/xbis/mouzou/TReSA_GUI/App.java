@@ -1,5 +1,8 @@
 package xbis.mouzou.TReSA_GUI;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -128,7 +131,13 @@ public class App extends Application {
 	        	int num = Integer.parseInt(result);
 				
 				if(!searchQuery.isBlank()) {
-					SearchResults.resultsWindow(stage, searchQuery, num, false);
+					List<Boolean> checkBoxes = new ArrayList<>();
+					checkBoxes.add(false);
+					checkBoxes.add(false);
+					checkBoxes.add(false);
+					checkBoxes.add(false);
+					
+					SearchResults.resultsWindow(stage, searchQuery, num, false, checkBoxes);
 			        stage.close();
 				}
 				else {

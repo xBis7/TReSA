@@ -2,12 +2,17 @@ package xbis.mouzou.TReSA_GUI;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -23,6 +28,8 @@ import javafx.stage.Stage;
 import xbis.mouzou.TReSA_Lucene.LuceneTester;
 
 public class AdvancedSearch {
+	
+	public static List <Boolean> checkBoxes = new ArrayList<>();
 
 	public static void advSearchWindow(Stage stage) {
 		
@@ -43,7 +50,15 @@ public class AdvancedSearch {
 
         VBox bodyVBox = new VBox();
         
+        HBox headerHBox = new HBox();
+        
+        HBox placesHBox = new HBox();
+        
+        HBox peopleHBox = new HBox();
+        
         HBox titleHBox = new HBox();
+        
+        HBox bodyHBox = new HBox();
         
         HBox buttonHBox = new HBox();
         
@@ -62,12 +77,20 @@ public class AdvancedSearch {
         placesField.setPromptText("Query places");
         placesField.setFont(Font.font("verdana", FontWeight.NORMAL, FontPosture.REGULAR, 16));
         
+        CheckBox placesCB = new CheckBox("Not Exist");
+        placesCB.setFont(Font.font("verdaba", FontWeight.NORMAL, FontPosture.REGULAR, 16));
+        placesCB.setSelected(false);
+        
         //people
         Label peopleLabel = new Label("Search in people");
         peopleLabel.setFont(Font.font("verdana", FontWeight.NORMAL, FontPosture.REGULAR, 16));
         TextField peopleField = new TextField();
         peopleField.setPromptText("Query people");
         peopleField.setFont(Font.font("verdana", FontWeight.NORMAL, FontPosture.REGULAR, 16));
+        
+        CheckBox peopleCB = new CheckBox("Not Exist");
+        peopleCB.setFont(Font.font("verdaba", FontWeight.NORMAL, FontPosture.REGULAR, 16));
+        peopleCB.setSelected(false);
         
         //title
         Label titleLabel = new Label("Search in title");
@@ -76,12 +99,20 @@ public class AdvancedSearch {
         titleField.setPromptText("Query title");
         titleField.setFont(Font.font("verdana", FontWeight.NORMAL, FontPosture.REGULAR, 16));
         
+        CheckBox titleCB = new CheckBox("Not Exist");
+        titleCB.setFont(Font.font("verdaba", FontWeight.NORMAL, FontPosture.REGULAR, 16));
+        titleCB.setSelected(false);
+        
         //body
         Label bodyLabel = new Label("Search in body");
         bodyLabel.setFont(Font.font("verdana", FontWeight.NORMAL, FontPosture.REGULAR, 16));
         TextField bodyField = new TextField();
         bodyField.setPromptText("Query body");
         bodyField.setFont(Font.font("verdana", FontWeight.NORMAL, FontPosture.REGULAR, 16));
+        
+        CheckBox bodyCB = new CheckBox("Not Exist");
+        bodyCB.setFont(Font.font("verdaba", FontWeight.NORMAL, FontPosture.REGULAR, 16));
+        bodyCB.setSelected(false);
         
         //buttons
         Button findButton = new Button("Find");
@@ -93,24 +124,32 @@ public class AdvancedSearch {
         backButton.setPrefSize(120.0, 60.0);
         
         stackPane.getChildren().addAll(mainVBox);
-        placesVBox.getChildren().addAll(placesLabel, placesField);
-        peopleVBox.getChildren().addAll(peopleLabel, peopleField);
-        titleVBox.getChildren().addAll(titleLabel, titleField);
-        bodyVBox.getChildren().addAll(bodyLabel, bodyField);
-        titleHBox.getChildren().addAll(advSearchLabel, resultNumCombo);
+        placesVBox.getChildren().addAll(placesHBox, placesField);
+        peopleVBox.getChildren().addAll(peopleHBox, peopleField);
+        titleVBox.getChildren().addAll(titleHBox, titleField);
+        bodyVBox.getChildren().addAll(bodyHBox, bodyField);
+        headerHBox.getChildren().addAll(advSearchLabel, resultNumCombo);
+        placesHBox.getChildren().addAll(placesLabel, placesCB);
+        peopleHBox.getChildren().addAll(peopleLabel, peopleCB);
+        titleHBox.getChildren().addAll(titleLabel, titleCB);
+        bodyHBox.getChildren().addAll(bodyLabel, bodyCB);
         buttonHBox.getChildren().addAll(findButton, backButton);
-        mainVBox.getChildren().addAll(titleHBox, placesVBox, peopleVBox, titleVBox, bodyVBox, buttonHBox);
+        mainVBox.getChildren().addAll(headerHBox, placesVBox, peopleVBox, titleVBox, bodyVBox, buttonHBox);
         
         mainVBox.setSpacing(30);
         placesVBox.setSpacing(10);
         peopleVBox.setSpacing(10);
         titleVBox.setSpacing(10);
         bodyVBox.setSpacing(10);
+        headerHBox.setSpacing(20);
+        placesHBox.setSpacing(20);
+        peopleHBox.setSpacing(20);
         titleHBox.setSpacing(20);
+        bodyHBox.setSpacing(20);
         buttonHBox.setSpacing(10);
         
         mainVBox.setAlignment(Pos.CENTER);
-        titleHBox.setAlignment(Pos.CENTER);
+        headerHBox.setAlignment(Pos.CENTER);
         buttonHBox.setAlignment(Pos.CENTER);
         
         StackPane.setMargin(mainVBox, new Insets(20, 20, 20, 20));
@@ -130,9 +169,7 @@ public class AdvancedSearch {
 	        	String places = placesField.getText();
 	            String people = peopleField.getText();
 	            String title = titleField.getText();
-	            String body = bodyField.getText();
-	        	
-	            String query = places + "&" + people + "&" + title + "&" + body; 
+	            String body = bodyField.getText(); 
 	            
 	            if(places.isBlank() && people.isBlank() && title.isBlank() && body.isBlank()) {
 	            	Alert alert = new Alert(AlertType.ERROR);
@@ -144,7 +181,37 @@ public class AdvancedSearch {
                     alert.showAndWait();
 	            }
 	            else {
-	            	SearchResults.resultsWindow(stage, query, num, true);
+	            	String query = places + "&" + people + "&" + title + "&" + body;
+	            	
+	            	if(placesCB.isSelected()) {
+	            		checkBoxes.add(true);
+	            	}
+	            	else {
+	            		checkBoxes.add(false);
+	            	}
+	            	
+	            	if(peopleCB.isSelected()) {
+	            		checkBoxes.add(true);
+	            	}
+	            	else {
+	            		checkBoxes.add(false);
+	            	}
+
+					if(titleCB.isSelected()) {
+						checkBoxes.add(true);
+					}
+					else {
+						checkBoxes.add(false);
+					}
+					
+					if(bodyCB.isSelected()) {
+						checkBoxes.add(true);
+					}
+					else {
+						checkBoxes.add(false);
+					}
+	            	
+	            	SearchResults.resultsWindow(stage, query, num, true, checkBoxes);
 	            	advSearchWin.close();
 	            }
 			}
