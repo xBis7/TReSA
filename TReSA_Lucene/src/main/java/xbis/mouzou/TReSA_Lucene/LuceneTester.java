@@ -134,8 +134,9 @@ public class LuceneTester {
 	         
 	       //print in terminal for debugging
 	       System.out.println("File: " + doc.get(LuceneConstants.FILE_PATH) + "\tScore: " + scoreDoc.score);
-	      
+	       System.out.println("before");
 	       String[] frag = searcher.getHighlightedFrag(false, scoreDoc);
+	       System.out.println("after");
 	       for(int j=0; j<frag.length ; j++) {
 	        	 
 	    	   //print in terminal for debugging

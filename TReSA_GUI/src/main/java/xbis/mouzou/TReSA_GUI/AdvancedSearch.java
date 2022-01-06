@@ -212,6 +212,7 @@ public class AdvancedSearch {
 					}
 	            	
 	            	SearchResults.resultsWindow(stage, query, num, true, checkBoxes);
+	            	checkBoxes.clear();
 	            	advSearchWin.close();
 	            }
 			}

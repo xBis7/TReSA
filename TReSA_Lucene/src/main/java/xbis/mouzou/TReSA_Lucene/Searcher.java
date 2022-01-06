@@ -74,7 +74,7 @@ public class Searcher {
 		  String bodyStr = queryStr[3];
 		  		  
 		  BooleanQuery.Builder chainQuery = new BooleanQuery.Builder();
-
+		  
 	      Query placesQuery = new TermQuery(new Term(LuceneConstants.PLACES, placesStr));
 	      Query peopleQuery = new TermQuery(new Term(LuceneConstants.PEOPLE, peopleStr));
 	      Query titleQuery = new TermQuery(new Term(LuceneConstants.TITLE, titleStr));
@@ -139,7 +139,6 @@ public class Searcher {
 	      return indexSearcher.search(booleanQuery, resultNum);
 	  }
 	  else {
-
 	      queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer());
 		  query = queryParser.parse(searchQuery);
 		  System.out.println("query: " + query.toString());
@@ -182,10 +181,9 @@ public class Searcher {
 	   mlt.setAnalyzer(new StandardAnalyzer());
 	   mlt.setFieldNames(new String[] {LuceneConstants.PLACES, LuceneConstants.PEOPLE, LuceneConstants.TITLE, LuceneConstants.BODY, LuceneConstants.CONTENTS});
 	   
-	   Query query = mlt.like(docId);
+	   query = mlt.like(docId);
 	   
 	   return indexSearcher.search(query, resultNum);
-
    }
    
    public Document getDocument(ScoreDoc scoreDoc) throws CorruptIndexException, IOException {
