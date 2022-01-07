@@ -1,6 +1,10 @@
 package xbis.mouzou.TReSA_GUI;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +17,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -28,6 +34,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import xbis.mouzou.TReSA_Lucene.LuceneTester;
@@ -147,6 +154,24 @@ public class SearchResults {
 		resultsWin.setScene(scene);
 		resultsWin.show();
 		
+		if(results.isEmpty()) {
+        	Alert alert = new Alert(AlertType.INFORMATION);
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.initOwner(resultsWin);
+            alert.setTitle("Documents Search Results");
+            alert.setHeaderText("No results");
+            alert.setContentText("There are no documents matching your query");
+            alert.showAndWait();
+            
+            if(advSearch == true) {
+    			AdvancedSearch.advSearchWindow(stage);
+    		}
+    		else {
+    			Search.newSearchWindow(stage);
+    		}
+            resultsWin.close();
+        }
+		
 		similarButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -158,9 +183,26 @@ public class SearchResults {
 				
 					try {
 						similarResults = search.moreLikeThis(docId, resultNum);
-						//data.clear();
-						data = FXCollections.observableArrayList(similarResults);
-				        table.setItems(data);
+						
+						if(similarResults.isEmpty()) {
+							Alert alert = new Alert(AlertType.INFORMATION);
+		                    alert.initModality(Modality.APPLICATION_MODAL);
+		                    alert.initOwner(resultsWin);
+		                    alert.setTitle("Similar Documents");
+		                    alert.setHeaderText("No results");
+		                    alert.setContentText("There are no documents similar to the selected option");
+		                    alert.showAndWait();
+						}
+						else {
+							data = FXCollections.observableArrayList(similarResults);
+							
+							Path filePath = Paths.get(result.getPath());
+							Path fileName = filePath.getFileName();
+							String article = fileName.toString();
+							queryLabel.setText("Similar Documents to '" + article + "' \t Top: " + resultNum + " results");
+					        
+							table.setItems(data);
+						}
 					} catch (ParseException e) {
 						e.printStackTrace();
 					} catch (InvalidTokenOffsetsException e) {
@@ -175,7 +217,18 @@ public class SearchResults {
 		openButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				//get selected file path in system and open
+				Result result = table.getSelectionModel().getSelectedItem();
+				if(result != null) {
+					String path = result.getPath();
+					File file = new File(path);
+					try {
+						if(Desktop.isDesktopSupported()){
+							Desktop.getDesktop().open(file);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
         });
 		

@@ -174,7 +174,7 @@ public class AdvancedSearch {
 	            if(places.isBlank() && people.isBlank() && title.isBlank() && body.isBlank()) {
 	            	Alert alert = new Alert(AlertType.ERROR);
                     alert.initModality(Modality.APPLICATION_MODAL);
-                    alert.initOwner(stage);
+                    alert.initOwner(advSearchWin);
                     alert.setTitle("Search Error");
                     alert.setHeaderText("All fields are empty");
                     alert.setContentText("Fill at least one field to proceed with the query");
