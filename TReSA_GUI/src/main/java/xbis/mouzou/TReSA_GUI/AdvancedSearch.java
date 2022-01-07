@@ -221,8 +221,7 @@ public class AdvancedSearch {
         backButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				App mainWin = new App();
-				mainWin.start(stage);
+				Search.newSearchWindow(stage);
 				advSearchWin.close();	
 			}
         });

@@ -46,21 +46,13 @@ public class LuceneTester {
 		dataDir = data.getAbsolutePath();
 	}
 
-	public List<Result> tester(String query, int resultNum, boolean advSearch, List<Boolean> queryNotExistList) {
+	public List<Result> results(String query, int resultNum, boolean advSearch, List<Boolean> queryNotExistList) {
       LuceneTester tester;
       List<Result> resultsList = new ArrayList<>();
       
       try { 
          tester = new LuceneTester();
-         
-         if(index.exists()) {
-        	//delete existing index files
-             tester.cleanIndexFiles();
-         }
-         
-         tester.createIndex();
          resultsList = tester.search(query, resultNum, advSearch, queryNotExistList);
-         
       } catch (IOException e) {
          e.printStackTrace();
       } catch (ParseException e) {
@@ -73,7 +65,14 @@ public class LuceneTester {
       
    }
 
-   private void createIndex() throws IOException {
+   public void createIndex() throws IOException {
+	  LuceneTester tester = new LuceneTester();
+       
+      if(index.exists()) {
+    	  //delete existing index files
+    	  tester.cleanIndexFiles();
+      }
+      
       indexer = new Indexer(indexDir);
       long startTime = System.currentTimeMillis();
       long endTime = System.currentTimeMillis();

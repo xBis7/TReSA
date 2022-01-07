@@ -56,7 +56,7 @@ public class SearchResults {
 		resultsWin.setMinWidth(900); 
 		
 		LuceneTester search = new LuceneTester();
-        results = search.tester(searchQuery, resultNum, advSearch, checkBoxes);
+        results = search.results(searchQuery, resultNum, advSearch, checkBoxes);
         
         VBox mainVBox = new VBox();
         
@@ -239,8 +239,7 @@ public class SearchResults {
 					AdvancedSearch.advSearchWindow(stage);
 				}
 				else {
-					App mainWin = new App();
-					mainWin.start(stage);
+					Search.newSearchWindow(stage);
 				}
 				resultsWin.close();	
 			}

@@ -75,11 +75,54 @@ public class Searcher {
 		  		  
 		  BooleanQuery.Builder chainQuery = new BooleanQuery.Builder();
 		  
-	      Query placesQuery = new TermQuery(new Term(LuceneConstants.PLACES, placesStr));
-	      Query peopleQuery = new TermQuery(new Term(LuceneConstants.PEOPLE, peopleStr));
-	      Query titleQuery = new TermQuery(new Term(LuceneConstants.TITLE, titleStr));
-	      Query bodyQuery = new TermQuery(new Term(LuceneConstants.BODY, bodyStr));
-	      
+		  Query placesQuery;
+		  Query peopleQuery;
+		  Query titleQuery;
+		  Query bodyQuery;
+		  
+		  //split based on whitespaces
+		  //delimit with more than spaces
+		  String[] placesWords = placesStr.split("[ ,./-:;?]+");
+		  String[] peopleWords = peopleStr.split("[ ,./-:;?]+");
+		  String[] titleWords = titleStr.split("[ ,./-:;?]+");
+		  String[] bodyWords = bodyStr.split("[ ,./-:;?]+");
+		  
+		  //places
+		  if(placesWords.length > 1) {
+			  QueryParser queryPar = new QueryParser(LuceneConstants.PLACES, new StandardAnalyzer());
+			  placesQuery = queryPar.createPhraseQuery(LuceneConstants.PLACES, placesStr , 0);
+		  }
+		  else {
+			  placesQuery = new TermQuery(new Term(LuceneConstants.PLACES, placesStr));
+		  }
+		  
+		  //people
+		  if(peopleWords.length > 1) {
+			  QueryParser queryPar = new QueryParser(LuceneConstants.PEOPLE, new StandardAnalyzer());
+			  peopleQuery = queryPar.createPhraseQuery(LuceneConstants.PEOPLE, peopleStr , 0);
+		  }
+		  else {
+			  peopleQuery = new TermQuery(new Term(LuceneConstants.PEOPLE, peopleStr));		  }
+		  
+		  //title
+		  if(titleWords.length > 1) {
+			  QueryParser queryPar = new QueryParser(LuceneConstants.TITLE, new StandardAnalyzer());
+			  titleQuery = queryPar.createPhraseQuery(LuceneConstants.TITLE, titleStr , 0);
+		  }
+		  else {
+		      titleQuery = new TermQuery(new Term(LuceneConstants.TITLE, titleStr));
+		  }
+		  
+		  //body
+		  if(bodyWords.length > 1) {
+			  QueryParser queryPar = new QueryParser(LuceneConstants.BODY, new StandardAnalyzer());
+			  bodyQuery = queryPar.createPhraseQuery(LuceneConstants.BODY, bodyStr , 0);
+		  }
+		  else {
+		      bodyQuery = new TermQuery(new Term(LuceneConstants.BODY, bodyStr));
+		  }
+		  
+		  
 	      //places boolean
 	      if(placesStr.isBlank()) {
 	    	  chainQuery.add(placesQuery, BooleanClause.Occur.SHOULD);
