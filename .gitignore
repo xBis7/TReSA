@@ -1,14 +1,14 @@
 #exclude all files inside dir
-TestData/*
+Reuters_articles/*
 Index/*
 
 /.metadata/
 
 #keep a few files as example documents
-!TestData/Article0.txt
-!TestData/Article1.txt
-!TestData/Article2.txt
-!TestData/Article3.txt
-!TestData/Article4.txt
-!TestData/Article5.txt
+!Reuters_articles/Article0.txt
+!Reuters_articles/Article1.txt
+!Reuters_articles/Article2.txt
+!Reuters_articles/Article3.txt
+!Reuters_articles/Article4.txt
+!Reuters_articles/Article5.txt
 

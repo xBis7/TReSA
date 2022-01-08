@@ -1,7 +1,13 @@
 package xbis.mouzou.TReSA_Lucene;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +46,7 @@ public class LuceneTester {
 		//path to Index dir 
 		indexDir = index.getAbsolutePath();
 	
-		data = new File(parentDir, "../TestData/");
+		data = new File(parentDir, "../Reuters_articles/");
 	   
 		//path to Data dir
 		dataDir = data.getAbsolutePath();
@@ -121,8 +127,7 @@ public class LuceneTester {
    
    public List<Result> moreLikeThis(int docId, int resultNum) throws IOException, ParseException, InvalidTokenOffsetsException {
 	   searcher = new Searcher(indexDir);
-	   
-	   
+
 	   TopDocs hits = searcher.moreLikeThis(docId, resultNum);
 	      
 	   List<Result> resultsList = new ArrayList<>();
@@ -148,6 +153,39 @@ public class LuceneTester {
 	   searcher.close();
 	      
 	   return resultsList;
+   }
+   
+   public void addFile(String places, String people, String title, String body, String fileName) {
+	   
+	   File file = new File(dataDir + "\\" + fileName + ".txt");
+	   
+	   	try {
+	   		file.createNewFile();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	   
+	   Path filePath = Paths.get(dataDir, fileName + ".txt");
+	   
+	   try (BufferedWriter writer = Files.newBufferedWriter(filePath, StandardCharsets.UTF_8, StandardOpenOption.APPEND)) {
+		   writer.write("<PLACES>" + places + "</PLACES>");
+		   writer.newLine();
+		   writer.write("<PEOPLE>" + people + "</PEOPLE>");
+		   writer.newLine();
+		   writer.write("<TITLE>" + title + "</TITLE>");
+		   writer.newLine();
+		   writer.write("<BODY>" + body + "\n</BODY>");
+		   
+	   } catch (IOException e) {
+		   e.printStackTrace();
+	   }
+   
+	   try {
+		   createIndex();
+	   } catch (IOException e) {
+		   e.printStackTrace();
+	   }
+	   
    }
    
    public void cleanIndexFiles() throws IOException{
