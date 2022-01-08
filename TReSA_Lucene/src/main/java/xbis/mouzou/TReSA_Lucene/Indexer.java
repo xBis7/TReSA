@@ -31,7 +31,6 @@ public class Indexer {
       if(!Files.exists(indexPath)) {
          Files.createDirectory(indexPath);
       }
-      //Path indexPath = Files.createTempDirectory(indexDirectoryPath);
       Directory indexDirectory = FSDirectory.open(indexPath);
       //create the indexer
       IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
@@ -65,13 +64,8 @@ public class Indexer {
       int placesEnd = allLines.indexOf("</PLACES>", placesStart);
       String places = allLines.substring(placesStart, placesEnd);
 
-      //places are not splited with whitespaces or any other delimiter
-      //we use StringField to store them as an entire string 
-      //and delimit them later
       Field placesField = new Field(LuceneConstants.PLACES, places, fieldType);
-      
-	
-      
+
       //index people
       int peopleStart = allLines.indexOf("<PEOPLE>") + "<PEOPLE>".length();
       int peopleEnd = allLines.indexOf("</PEOPLE>", peopleStart);
@@ -92,8 +86,6 @@ public class Indexer {
       String body = allLines.substring(bodyStart, bodyEnd);
 
       Field bodyField = new Field(LuceneConstants.BODY, body, fieldType);
-
-      //System.out.println("places:----- " + placesField + "\npeople:----- " + peopleField + "\ntitle:----- " + titleField + "\nbody:----- " + bodyField);
       
       //index all file contents at once for simple search
       String contents = places + "\n" + people + "\n" + title + "\n" + body;
@@ -118,7 +110,6 @@ public class Indexer {
 
    private void indexFile(File file) throws IOException {
 
-      //System.out.println("Indexing " + file.getCanonicalPath());
       Document document = getDocument(file);
       writer.addDocument(document);
    

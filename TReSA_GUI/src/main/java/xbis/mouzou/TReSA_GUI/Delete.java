@@ -58,7 +58,7 @@ public class Delete {
 		deleteDocLabel.setFont(Font.font("Courier New", FontWeight.BOLD, FontPosture.REGULAR, 28));
 
         //places
-        Label deleteLabel = new Label("Query document to delete");
+        Label deleteLabel = new Label("Query term to delete");
         deleteLabel.setFont(Font.font("verdana", FontWeight.NORMAL, FontPosture.REGULAR, 16));
         TextField deleteField = new TextField();
         deleteField.setPromptText("Enter term");

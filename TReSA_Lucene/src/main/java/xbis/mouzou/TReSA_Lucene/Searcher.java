@@ -52,14 +52,10 @@ public class Searcher {
       indexDirectory = FSDirectory.open(indexPath);
       indexReader = DirectoryReader.open(indexDirectory);
       indexSearcher = new IndexSearcher(indexReader);
-      //queryParser = new QueryParser(LuceneConstants.CONTENTS, new StandardAnalyzer());
    }
    
    public TopDocs search(String searchQuery, int resultNum, boolean advSearch, List<Boolean> queryNotExistList) throws IOException, ParseException {
-	   //when more than one word search in each field
-	   //no results
 
-	   
 	  //we cannot only search for documents that dont have a word
 	  //we must specify and a word that exists
 	  //otherwise score cant be calculated and there will be no results
@@ -80,8 +76,6 @@ public class Searcher {
 		  Query titleQuery;
 		  Query bodyQuery;
 		  
-		  //split based on whitespaces
-		  //delimit with more than spaces
 		  String[] placesWords = placesStr.split("[ ,./-:;?]+");
 		  String[] peopleWords = peopleStr.split("[ ,./-:;?]+");
 		  String[] titleWords = titleStr.split("[ ,./-:;?]+");
@@ -177,7 +171,6 @@ public class Searcher {
 	      
 	      booleanQuery = chainQuery.build();
 
-	      //
 	      System.out.println("query: " + booleanQuery.toString());
 	      return indexSearcher.search(booleanQuery, resultNum);
 	  }
