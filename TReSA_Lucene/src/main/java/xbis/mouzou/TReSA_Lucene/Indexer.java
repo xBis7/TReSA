@@ -123,6 +123,19 @@ public class Indexer {
       writer.addDocument(document);
    
    }
+   
+   public boolean deleteDoc(String text) {
+	   Term term = new Term(LuceneConstants.CONTENTS, text);
+	   try {
+		   writer.deleteDocuments(term);
+		   writer.commit();
+		   writer.close();
+	   } catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	   return true;   
+   }
 
    public int createIndex(String dataDirPath, FileFilter filter) throws IOException {
       

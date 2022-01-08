@@ -12,6 +12,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -142,6 +144,40 @@ public class Search {
                     alert.setHeaderText("Empty Search Bar");
                     alert.setContentText("Make a query to the search engine");
                     alert.showAndWait();
+				}
+			}
+        });
+        
+        //search field action on key ENTER
+        searchField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+			@Override
+			public void handle(KeyEvent event) {
+				if(event.getCode().equals(KeyCode.ENTER)) {
+					searchQuery = searchField.getText();
+		        	String result = resultNumCombo.getValue();
+
+		        	int num = Integer.parseInt(result);
+					
+					if(!searchQuery.isBlank()) {
+						List<Boolean> checkBoxes = new ArrayList<>();
+						checkBoxes.add(false);
+						checkBoxes.add(false);
+						checkBoxes.add(false);
+						checkBoxes.add(false);
+						
+						SearchResults.resultsWindow(stage, searchQuery, num, false, checkBoxes);
+						newSearchWin.close();
+					}
+					else {
+						Alert alert = new Alert(AlertType.ERROR);
+	                    alert.initModality(Modality.APPLICATION_MODAL);
+	                    alert.initOwner(newSearchWin);
+	                    alert.setTitle("Search Error");
+	                    alert.setHeaderText("Empty Search Bar");
+	                    alert.setContentText("Make a query to the search engine");
+	                    alert.showAndWait();
+					}
 				}
 			}
         });
