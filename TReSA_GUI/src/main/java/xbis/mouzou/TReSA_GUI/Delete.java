@@ -44,15 +44,7 @@ public class Delete {
 		
 		VBox deleteVBox = new VBox();
 		
-		HBox deleteHBox = new HBox();
-		
 		HBox buttonHBox = new HBox();
-		
-		ComboBox<String> resultNumCombo = new ComboBox<String>();
-        
-        resultNumCombo.getItems().addAll("10", "20", "30", "50", "70", "100", "120");
-        
-        resultNumCombo.getSelectionModel().select(2);
         
 		Label deleteDocLabel = new Label("Delete Document from Index");
 		deleteDocLabel.setFont(Font.font("Courier New", FontWeight.BOLD, FontPosture.REGULAR, 28));
@@ -74,27 +66,18 @@ public class Delete {
         backButton.setPrefSize(120.0, 60.0);
         
         stackPane.getChildren().addAll(mainVBox);
-        deleteVBox.getChildren().addAll(deleteLabel, deleteHBox);
-        deleteHBox.getChildren().addAll(deleteField, resultNumCombo);
+        deleteVBox.getChildren().addAll(deleteLabel, deleteField);
         buttonHBox.getChildren().addAll(deleteButton, backButton);
         mainVBox.getChildren().addAll(deleteDocLabel, deleteVBox, buttonHBox);
         
         mainVBox.setSpacing(30);
         deleteVBox.setSpacing(10);
         buttonHBox.setSpacing(20);
-        deleteHBox.setSpacing(20);
         
         mainVBox.setAlignment(Pos.CENTER);
         buttonHBox.setAlignment(Pos.CENTER);
-        deleteHBox.setAlignment(Pos.CENTER);
         
         StackPane.setMargin(mainVBox, new Insets(20, 20, 20, 20));
-        
-        resultNumCombo.setStyle("-fx-font-size: 16");
-        
-        deleteHBox.setHgrow(deleteField, Priority.ALWAYS);
-        deleteHBox.setHgrow(resultNumCombo, Priority.NEVER);
-        
         
         deleteWin.setTitle("Delete article");
         deleteWin.setScene(scene);
@@ -115,12 +98,10 @@ public class Delete {
                     alert.showAndWait();
 				}
 				else {
-					String result = resultNumCombo.getValue();
-		        	int num = Integer.parseInt(result);
 					boolean delete = false;
 					
 					try {
-						delete = tester.deleteFile(term, num);
+						delete = tester.deleteFile(term);
 					} catch (ParseException | IOException e) {
 						e.printStackTrace();
 					}

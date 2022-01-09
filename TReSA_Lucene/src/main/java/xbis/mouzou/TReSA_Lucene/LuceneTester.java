@@ -188,7 +188,7 @@ public class LuceneTester {
 	   
    }
    
-   public boolean deleteFile(String term, int resultNum) throws ParseException, IOException {
+   public boolean deleteFile(String term) throws ParseException, IOException {
 	   
 	   indexer = new Indexer(indexDir);
 	   boolean delete =  indexer.deleteDoc(term);
